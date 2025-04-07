@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd+Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd+Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -72,11 +72,43 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut list_c = LinkedList::<T>::new();
+        let mut a_ptr= list_a.start;
+        let mut b_ptr= list_b.start;
+        while let (Some(a_node),Some(b_node)) = (a_ptr,b_ptr){
+            unsafe{
+                let a_num=(*a_node.as_ptr()).val.clone();
+                let b_num=(*b_node.as_ptr()).val.clone();
+                if a_num < b_num{
+                    list_c.add(a_num);
+                    a_ptr = (*a_node.as_ptr()).next;
+                }else {
+                    list_c.add(b_num);
+                    b_ptr = (*b_node.as_ptr()).next;
+                }
+            }
         }
+        if a_ptr.is_none(){
+            unsafe{
+                while let Some(b_node) = b_ptr{
+                    list_c.add((*b_node.as_ptr()).val.clone());
+                    b_ptr = (*b_node.as_ptr()).next;
+                }
+            }
+        }else {
+            unsafe{
+                while let Some(a_node) = a_ptr{
+                    list_c.add((*a_node.as_ptr()).val.clone());
+                    a_ptr = (*a_node.as_ptr()).next;
+                }
+            }
+        }
+        list_c
+		// Self {
+        //     length: 0,
+        //     start: None,
+        //     end: None,
+        // }
 	}
 }
 
